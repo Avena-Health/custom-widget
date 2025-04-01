@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import './WhatsAppWidget.css';
 
 const WhatsAppWidget = ({ 
@@ -7,27 +7,132 @@ const WhatsAppWidget = ({
   companyName = 'Natalia de Avena Health',
   responseTime = 'Tipicamente respondemos en minutos',
   avatar = null,
+  exitIntentTrigger = true,
+  sensitivity = 20,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [isClosing, setIsClosing] = useState(false);
+  const [hasTriggeredExitIntent, setHasTriggeredExitIntent] = useState(false);
+  const [isAnimating, setIsAnimating] = useState(false);
+  const chatWindowRef = useRef(null);
+  const lastY = useRef(0);
+  const exitIntentTimeout = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (chatWindowRef.current && !chatWindowRef.current.contains(event.target) && 
+          !event.target.closest('.whatsapp-widget-button')) {
+        handleClose(event);
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (!exitIntentTrigger || hasTriggeredExitIntent) return;
+
+    const handleExitIntent = (e) => {
+      if (isOpen) return;
+
+      const { clientY } = e;
+      const velocity = lastY.current - clientY;
+      lastY.current = clientY;
+
+      if (exitIntentTimeout.current) {
+        clearTimeout(exitIntentTimeout.current);
+      }
+
+      if (clientY < sensitivity && velocity > 0) {
+        exitIntentTimeout.current = setTimeout(() => {
+          setIsOpen(true);
+          setHasTriggeredExitIntent(true);
+        }, 100);
+      }
+    };
+
+    const handleMouseLeave = (e) => {
+      if (e.clientY <= 0 && !isOpen) {
+        setIsOpen(true);
+        setHasTriggeredExitIntent(true);
+      }
+    };
+
+    document.addEventListener('mousemove', handleExitIntent);
+    document.addEventListener('mouseleave', handleMouseLeave);
+
+    return () => {
+      document.removeEventListener('mousemove', handleExitIntent);
+      document.removeEventListener('mouseleave', handleMouseLeave);
+      if (exitIntentTimeout.current) {
+        clearTimeout(exitIntentTimeout.current);
+      }
+    };
+  }, [exitIntentTrigger, hasTriggeredExitIntent, isOpen, sensitivity]);
 
   const handleClick = () => {
     const encodedMessage = encodeURIComponent(message);
     window.open(`https://wa.me/${phoneNumber}?text=${encodedMessage}`, '_blank');
   };
 
-  const toggleChat = () => {
-    setIsOpen(!isOpen);
+  const handleClose = (e) => {
+    e.stopPropagation();
+    if (!isClosing) {
+      setIsClosing(true);
+      setTimeout(() => {
+        setIsOpen(false);
+        setIsClosing(false);
+      }, 300);
+    }
   };
 
-  const handleCloseChat = (e) => {
-    e.stopPropagation();
-    setIsOpen(false);
+  const toggleChat = () => {
+    if (isOpen) {
+      handleClose({ stopPropagation: () => {} });
+    } else {
+      setIsOpen(true);
+    }
   };
+
+  useEffect(() => {
+    if (hasTriggeredExitIntent) {
+      const resetTimeout = setTimeout(() => {
+        setHasTriggeredExitIntent(false);
+      }, 30 * 60 * 1000);
+
+      return () => clearTimeout(resetTimeout);
+    }
+  }, [hasTriggeredExitIntent]);
+
+  // Control wave animation timing
+  useEffect(() => {
+    const animationTimer = setTimeout(() => {
+      setIsAnimating(true);
+      
+      // Stop animation after 4 seconds
+      const stopTimer = setTimeout(() => {
+        setIsAnimating(false);
+      }, 4000);
+
+      return () => clearTimeout(stopTimer);
+    }, 5000); // Start animation after 5 seconds
+
+    return () => clearTimeout(animationTimer);
+  }, []);
 
   return (
     <div className="whatsapp-widget">
       {isOpen && (
-        <div className="whatsapp-chat-window">
+        <div 
+          ref={chatWindowRef}
+          className={`whatsapp-chat-window ${isClosing ? 'chat-window-exit' : ''}`}
+        >
           <div className="chat-header">
             {avatar ? (
               <img src={avatar} alt="Profile" className="avatar" />
@@ -42,7 +147,7 @@ const WhatsAppWidget = ({
             </div>
             <button 
               className="close-button"
-              onClick={handleCloseChat}
+              onClick={handleClose}
               aria-label="Close chat"
             >
               ×
@@ -76,10 +181,13 @@ const WhatsAppWidget = ({
         </div>
       )}
       <button 
-        className={`whatsapp-widget-button ${isOpen ? 'active' : ''}`}
+        className={`whatsapp-widget-button ${isOpen ? 'active' : ''} ${isAnimating ? 'animate-waves' : ''}`}
         onClick={toggleChat}
         aria-label="Open WhatsApp chat"
       >
+        <div className="wave-circle"></div>
+        <div className="wave-circle"></div>
+        <div className="wave-circle"></div>
         <svg
           className="whatsapp-icon"
           xmlns="http://www.w3.org/2000/svg"

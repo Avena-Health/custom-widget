@@ -17,10 +17,61 @@
   align-items: center;
   justify-content: center;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   padding: 0;
   outline: none;
   position: relative;
+  z-index: 2;
+}
+
+/* Pulsing waves effect */
+.wave-circle {
+  position: absolute;
+  border-radius: 50%;
+  background-color: transparent;
+  border: 1.5px solid rgba(37, 211, 102, 0.5);
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* Animation classes that will be added via JavaScript */
+.animate-waves .wave-circle {
+  animation: gentleWave 4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.animate-waves .wave-circle:nth-child(1) {
+  animation-delay: 0.2s;
+}
+
+.animate-waves .wave-circle:nth-child(2) {
+  animation-delay: 0.6s;
+}
+
+.animate-waves .wave-circle:nth-child(3) {
+  animation-delay: 1s;
+}
+
+@keyframes gentleWave {
+  0% {
+    transform: scale(1);
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.2;
+  }
+  40% {
+    opacity: 0.15;
+  }
+  60% {
+    opacity: 0.1;
+  }
+  100% {
+    transform: scale(1.8);
+    opacity: 0;
+  }
 }
 
 .whatsapp-widget-button::after {
@@ -33,10 +84,11 @@
   top: 0;
   right: 0;
   border: 2px solid white;
+  z-index: 3;
 }
 
 .whatsapp-widget-button:hover {
-  transform: scale(1.1);
+  transform: scale(1.1) rotate(5deg);
   box-shadow: 0 6px 14px rgba(0, 0, 0, 0.4);
 }
 
@@ -44,7 +96,7 @@
   width: 30px;
   height: 30px;
   color: white;
-  transition: transform 0.3s ease;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .whatsapp-icon-small {
@@ -62,8 +114,9 @@
   border-radius: 10px;
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
   overflow: hidden;
-  animation: slideIn 0.3s ease forwards;
+  animation: slideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
   transform-origin: bottom right;
+  opacity: 0;
 }
 
 .chat-header {
@@ -97,12 +150,14 @@
   margin: 0;
   font-size: 16px;
   font-weight: 600;
+  color: white;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
 
 .header-info p {
   margin: 4px 0 0;
   font-size: 12px;
-  opacity: 0.8;
+  color: rgba(255, 255, 255, 0.9);
 }
 
 .close-button {
@@ -116,6 +171,13 @@
   cursor: pointer;
   padding: 4px;
   line-height: 1;
+  opacity: 0.9;
+  transition: all 0.2s ease;
+}
+
+.close-button:hover {
+  opacity: 1;
+  transform: scale(1.1);
 }
 
 .chat-body {
@@ -135,8 +197,15 @@
   align-self: flex-start;
   font-size: 14px;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-  animation: messageSlideIn 0.3s ease forwards;
+  animation: messageSlideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  opacity: 0;
+  color: #303030;
+  line-height: 1.4;
 }
+
+.message-bubble:nth-child(1) { animation-delay: 0.1s; }
+.message-bubble:nth-child(2) { animation-delay: 0.2s; }
+.message-bubble:nth-child(3) { animation-delay: 0.3s; }
 
 .contact-button {
   background-color: #25D366;
@@ -152,12 +221,21 @@
   justify-content: center;
   margin-top: 16px;
   width: 100%;
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  animation: buttonFadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  animation-delay: 0.4s;
+  opacity: 0;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 .contact-button:hover {
   background-color: #128C7E;
   transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.chat-window-exit {
+  animation: slideOut 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
 
 @keyframes slideIn {
@@ -171,7 +249,29 @@
   }
 }
 
+@keyframes slideOut {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(20px) scale(0.9);
+  }
+}
+
 @keyframes messageSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes buttonFadeIn {
   from {
     opacity: 0;
     transform: translateY(10px);
