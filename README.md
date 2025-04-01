@@ -15,9 +15,9 @@ A beautiful and customizable WhatsApp chat widget for React applications. This c
 ## Installation
 
 ```bash
-npm install react-whatsapp-widget
+npm install @avena-health/whatsapp-widget
 # or
-yarn add react-whatsapp-widget
+yarn add @avena-health/whatsapp-widget
 ```
 
 ## Usage
