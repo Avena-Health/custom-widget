@@ -23,8 +23,7 @@ yarn add react-whatsapp-widget
 ## Usage
 
 ```jsx
-import { WhatsAppWidget } from 'react-whatsapp-widget';
-import 'react-whatsapp-widget/dist/styles.css';
+import { WhatsAppWidget } from '@avena-health/whatsapp-widget';
 
 function App() {
   return (
@@ -93,4 +92,4 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## License
 
-MIT © [Your Name]
+MIT © Avena Health
