@@ -1,14 +1,14 @@
 .whatsapp-widget {
   position: fixed;
-  bottom: 20px;
-  right: 20px;
-  z-index: 1000;
+  z-index: 99999999;
+  margin: 22px 22px;
+  inset: auto 0px 0px auto;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
 }
 
 .whatsapp-widget-button {
-  width: 60px;
-  height: 60px;
+  width: 70px;
+  height: 70px;
   border-radius: 50%;
   background-color: #25D366;
   border: none;
@@ -22,6 +22,18 @@
   outline: none;
   position: relative;
   z-index: 2;
+}
+
+.notification-dot {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 12px;
+  height: 12px;
+  background-color: #ff4444;
+  border-radius: 50%;
+  border: 2px solid white;
+  z-index: 3;
 }
 
 /* Pulsing waves effect */
@@ -93,25 +105,26 @@
 }
 
 .whatsapp-icon {
-  width: 30px;
-  height: 30px;
+  width: 40px;
+  height: 40px;
   color: white;
   transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .whatsapp-icon-small {
-  width: 20px;
-  height: 20px;
+  width: 23px;
+  height: 23px;
   margin-right: 8px;
 }
 
 .whatsapp-chat-window {
   position: absolute;
-  bottom: 80px;
-  right: 0;
-  width: 320px;
-  background-color: white;
-  border-radius: 10px;
+  bottom: 82px;
+  right: 40px;
+  width: 390px;
+  background-color: transparent;
+  border-radius: 12px;
+  border-bottom-right-radius: 0;
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
   overflow: hidden;
   animation: slideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
@@ -120,19 +133,19 @@
 }
 
 .chat-header {
-  background-color: #075E54;
+  background-color: #015C4B;
   color: white;
-  padding: 20px;
+  padding: 1em 2.5em 1em 1.4em;
   display: flex;
   align-items: center;
   position: relative;
+  gap: 0.8em;
 }
 
 .avatar, .avatar-placeholder {
-  width: 40px;
-  height: 40px;
+  width: 63px;
+  height: 63px;
   border-radius: 50%;
-  margin-right: 12px;
   background-color: #128C7E;
   display: flex;
   align-items: center;
@@ -140,33 +153,44 @@
   font-size: 18px;
   color: white;
   font-weight: bold;
+  border: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.avatar {
+  object-fit: cover;
 }
 
 .header-info {
   flex: 1;
+  text-align: start;
 }
 
 .header-info h3 {
   margin: 0;
-  font-size: 16px;
-  font-weight: 600;
+  font-size: 1.4em;
+  line-height: 1.2em;
+  font-weight: bold;
   color: white;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
 
 .header-info p {
-  margin: 4px 0 0;
-  font-size: 12px;
-  color: rgba(255, 255, 255, 0.9);
+  margin: 0;
+  font-size: 0.9em;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.8);
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .close-button {
   position: absolute;
-  top: 8px;
+  top: 2px;
   right: 8px;
   background: none;
   border: none;
-  color: white;
+  color: rgba(255, 255, 255, 0.7);
   font-size: 24px;
   cursor: pointer;
   padding: 4px;
@@ -183,24 +207,27 @@
 .chat-body {
   padding: 20px;
   background-color: #E5DDD5;
-  min-height: 250px;
+  min-height: 280px;
   display: flex;
   flex-direction: column;
   gap: 8px;
+  position: relative;
 }
 
 .message-bubble {
   background-color: white;
   padding: 12px 16px;
-  border-radius: 8px;
-  max-width: 85%;
+  border-radius: 10px;
+  border-top-left-radius: 0;
+  max-width: 80%;
   align-self: flex-start;
-  font-size: 14px;
+  text-align: start;
+  font-size: 1em;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
   animation: messageSlideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
   opacity: 0;
   color: #303030;
-  line-height: 1.4;
+  font-weight: 500;
 }
 
 .message-bubble:nth-child(1) { animation-delay: 0.1s; }
@@ -213,18 +240,19 @@
   border: none;
   border-radius: 25px;
   padding: 12px 24px;
-  font-size: 14px;
-  font-weight: 600;
+  font-size: 18px;
+  font-weight: bold;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-top: 16px;
-  width: 100%;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  width: 90%;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   animation: buttonFadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
   animation-delay: 0.4s;
   opacity: 0;
+  margin: auto;
+  margin-top: 2em;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
@@ -297,5 +325,29 @@
   .whatsapp-icon {
     width: 25px;
     height: 25px;
+  }
+  
+  .avatar, .avatar-placeholder {
+    width: 45px;
+    height: 45px;
+    font-size: 16px;
+  }
+  
+  .header-info h3 {
+    font-size: 1.2em;
+  }
+  
+  .header-info p {
+    font-size: 0.8em;
+  }
+  
+  .message-bubble {
+    font-size: 0.95em;
+    padding: 10px 14px;
+  }
+  
+  .contact-button {
+    font-size: 16px;
+    padding: 10px 20px;
   }
 }

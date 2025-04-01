@@ -3,7 +3,7 @@ import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
 import WhatsAppWidget from './components/WhatsAppWidget'
-
+import agentWhats from './assets/profile-image.jpg';
 function App() {
   const [count, setCount] = useState(0)
 
@@ -35,7 +35,8 @@ function App() {
         phoneNumber="1234567890"
         companyName="Natalia de Avena Health"
         responseTime="Tipicamente respondemos en minutos"
-        message="¿Estás pensando en contratar Avena y tienes dudas?"
+        messages={['¡Hola!','¿Estás pensando en contratar Avena y tienes dudas?', 'Yo te puedo ayudar.']}
+        avatar={agentWhats}
       />
     </>
   )
