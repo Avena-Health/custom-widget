@@ -1,54 +1,50 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 
-import './WhatsAppWidget.css';
+import styles from './WhatsAppWidget.module.css';
 
 export type  WhatsAppMessage = string;
 
 export interface WhatsAppWidgetProps {
   /** Phone number in international format */
   phoneNumber: string;
-  
   /** Company or person name displayed in the header */
   companyName?: string;
-  
   /** Response time message displayed under the name */
   responseTime?: string;
-  
   /** URL to the avatar image */
   avatar?: string;
-  
   /** Array of messages to display in the chat */
   messages?: WhatsAppMessage[];
-  
   /** Default message to send when clicking the WhatsApp button */
   defaultMessage?: string;
-  
   /** Whether to enable exit intent detection */
   enableExitIntent?: boolean;
-  
   /** Sensitivity for exit intent detection in pixels from top */
   exitIntentSensitivity?: number;
-  
   /** Callback when chat window opens */
   onOpen?: () => void;
-  
   /** Callback when chat window closes */
   onClose?: () => void;
-  
   /** Callback when WhatsApp redirect button is clicked */
   onRedirect?: () => void;
-  
   /** Custom class name for the widget container */
   className?: string;
-  
   /** Whether to show the notification dot */
   showNotification?: boolean;
-  
   /** Custom styles for the widget */
   style?: React.CSSProperties;
 }
 
 const defaultMessages: WhatsAppMessage[] = ['¡Hola!'];
+
+// Typing indicator component
+const TypingIndicator: React.FC = () => (
+  <div className={styles['typing-indicator']}>
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+);
 
 export const WhatsAppWidget: React.FC<WhatsAppWidgetProps> = ({
   phoneNumber,
@@ -70,13 +66,21 @@ export const WhatsAppWidget: React.FC<WhatsAppWidgetProps> = ({
   const [isClosing, setIsClosing] = useState(false);
   const [hasTriggeredExitIntent, setHasTriggeredExitIntent] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
-
-  
+  const [isTyping, setIsTyping] = useState(true);
   const chatWindowRef = useRef<HTMLDivElement>(null);
   const lastY = useRef(0);
   const exitIntentTimeout = useRef<NodeJS.Timeout | null>(null);
 
 
+useEffect(() => {
+  if(isOpen) {
+    setTimeout(() => {
+      setIsTyping(false);
+    }, 800);
+  } else {
+    setIsTyping(true);
+  }
+}, [isOpen]);
 
   const handleClickOutside = useCallback((event: MouseEvent) => {
     if (
@@ -191,73 +195,78 @@ export const WhatsAppWidget: React.FC<WhatsAppWidgetProps> = ({
   }, []);
 
   return (
-    <div className={`whatsapp-widget ${className}`} style={style}>
+    <div className={`${styles['whatsapp-widget']} ${className}`} style={style}>
       {isOpen && (
         <div 
           ref={chatWindowRef}
-          className={`whatsapp-chat-window ${isClosing ? 'chat-window-exit' : ''}`}
+          className={`${styles['chat-window']} ${isClosing ? styles['closing'] : ''}`}
         >
-          <div className="chat-header">
-            {avatar ? (
-              <img src={avatar} alt="Profile" className="avatar" />
-            ) : (
-              <div className="avatar-placeholder">
-                {companyName.charAt(0)}
+          <div className={styles['chat-header']}>
+            <div className={styles['chat-header-content']}>
+              {avatar && (
+                <img
+                  src={avatar}
+                  alt={companyName}
+                  className={styles['company-avatar']}
+                />
+              )}
+              <div className={styles['chat-header-text']}>
+                <h4>{companyName}</h4>
+                <p>{responseTime}</p>
               </div>
-            )}
-            <div className="header-info">
-              <h3>{companyName}</h3>
-              <p>{responseTime}</p>
             </div>
             <button 
-              className="close-button"
-              onClick={handleClose}
+              onClick={handleClose} 
+              className={styles['close-button']}
               aria-label="Close chat"
             >
               ×
             </button>
           </div>
-          <div className="chat-body">
+          <div className={styles['chat-messages']}>
             {messages.map((message, index) => (
-              <div key={index} className="message-bubble">
-                {message}
+              <div key={index} className={styles['message']}>
+                {isTyping && index === messages.length - 1 ? (
+                  <TypingIndicator />
+                ) : (
+                  message
+                )}
               </div>
             ))}
-            <button 
-              className="contact-button"
+          </div>
+          <div className={styles['chat-footer']}>
+            <button
               onClick={handleRedirect}
+              className={styles['whatsapp-button']}
             >
-              <svg
-                className="whatsapp-icon-small"
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="currentColor"
-              >
-                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
-              </svg>
-              Contactar ahora
+              Iniciar conversación
             </button>
           </div>
         </div>
       )}
-      <button 
-        className={`whatsapp-widget-button ${isOpen ? 'active' : ''} ${isAnimating ? 'animate-waves' : ''}`}
-        onClick={toggleChat}
-        aria-label="Open WhatsApp chat"
-      >
-        <div className="wave-circle"></div>
-        <div className="wave-circle"></div>
-        <div className="wave-circle"></div>
-        <svg
-          className="whatsapp-icon"
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 24 24"
-          fill="currentColor"
+      {!isOpen && (
+        <button
+          onClick={toggleChat}
+          className={`${styles['whatsapp-widget-button']} ${
+            isAnimating ? styles['animate'] : ''
+          }`}
+          aria-label="Open WhatsApp chat"
         >
-          <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
-        </svg>
-        {showNotification && <span className="notification-dot" />}
-      </button>
+          {showNotification && (
+            <span className={styles['notification-dot']}></span>
+          )}
+          <svg
+            className={styles['whatsapp-icon']}
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 32 32"
+          >
+            <path
+              d=" M19.11 17.205c-.372 0-1.088 1.39-1.518 1.39a.63.63 0 0 1-.315-.1c-.802-.402-1.504-.817-2.163-1.447-.545-.516-1.146-1.29-1.46-1.963a.426.426 0 0 1-.073-.215c0-.33.99-.945.99-1.49 0-.143-.73-2.09-.832-2.335-.143-.372-.214-.487-.6-.487-.187 0-.36-.043-.53-.043-.302 0-.53.115-.746.315-.688.645-1.032 1.318-1.06 2.264v.114c-.015.99.472 1.977 1.017 2.78 1.23 1.82 2.506 3.41 4.554 4.34.616.287 2.035.888 2.722.888.817 0 2.15-.515 2.478-1.318.13-.33.244-.73.244-1.088 0-.058 0-.144-.03-.215-.1-.172-2.434-1.39-2.678-1.39zm-2.908 7.593c-1.747 0-3.48-.53-4.942-1.49L7.793 24.41l1.132-3.337a8.955 8.955 0 0 1-1.72-5.272c0-4.955 4.04-8.995 8.997-8.995S25.2 10.845 25.2 15.8c0 4.958-4.04 8.998-8.998 8.998zm0-19.798c-5.96 0-10.8 4.842-10.8 10.8 0 1.964.53 3.898 1.546 5.574L5 27.176l5.974-1.92a10.807 10.807 0 0 0 16.03-9.455c0-5.958-4.842-10.8-10.802-10.8z"
+              fill="#fff"
+            />
+          </svg>
+        </button>
+      )}
     </div>
   );
 };

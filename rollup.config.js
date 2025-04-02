@@ -4,12 +4,14 @@ import typescript from '@rollup/plugin-typescript';
 import { terser } from 'rollup-plugin-terser';
 import external from 'rollup-plugin-peer-deps-external';
 import postcss from 'rollup-plugin-postcss';
+import autoprefixer from 'autoprefixer';
+import postcssNested from 'postcss-nested';
 import { readFileSync } from 'fs';
 
 const pkg = JSON.parse(readFileSync(new URL('./package.json', import.meta.url), 'utf8'));
 
 export default {
-  input: 'src/components/WhatsAppWidget.tsx',
+  input: 'src/WhatsAppWidget.tsx',
   output: [
     {
       file: pkg.main,
@@ -32,9 +34,16 @@ export default {
       exclude: ['**/__tests__/**']
     }),
     postcss({
-      extensions: ['.css'],
+      modules: {
+        generateScopedName: '[name]__[local]___[hash:base64:5]'
+      },
+      extract: 'dist/styles.css',
       minimize: true,
-      extract: 'styles.css'
+      autoModules: true,
+      plugins: [
+        autoprefixer,
+        postcssNested
+      ]
     }),
     terser()
   ]
