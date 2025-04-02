@@ -1,6 +1,6 @@
 {
-  "name": "@avena-health/whatsapp-widget",
-  "version": "1.0.0",
+  "name": "avena-whatsapp-widget",
+  "version": "1.0.1",
   "description": "A beautiful and customizable WhatsApp chat widget for React applications",
   "type": "module",
   "main": "dist/index.js",
@@ -27,10 +27,6 @@
   ],
   "author": "Your Name",
   "license": "MIT",
-  "dependencies": {
-    "react": ">=16.8.0",
-    "react-dom": ">=16.8.0"
-  },
   "peerDependencies": {
     "react": ">=16.8.0",
     "react-dom": ">=16.8.0"
